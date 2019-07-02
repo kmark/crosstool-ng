@@ -1,0 +1,29 @@
+From b36182170527cf823466a62b5188a57410b45f51 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 15:05:24 -0400
+Subject: [PATCH 5/9] alpha-fix-rtld-fPIC
+
+2009-05-26  Aurelien Jarno  <aurelien@aurel32.net>
+
+	* sysdeps/alpha/Makefile (CFLAGS-rtld.c): add $(PIC-ccflag).
+---
+ sysdeps/alpha/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sysdeps/alpha/Makefile b/sysdeps/alpha/Makefile
+index 725ae435..2b6b1af0 100644
+--- a/sysdeps/alpha/Makefile
++++ b/sysdeps/alpha/Makefile
+@@ -35,7 +35,8 @@ endif
+ 
+ ifeq ($(subdir),elf)
+ # The ld.so startup code cannot use literals until it self-relocates.
+-CFLAGS-rtld.c = -mbuild-constants
++# It uses more than 64k for the small data area.
++CFLAGS-rtld.c = -mbuild-constants $(PIC-ccflag)
+ endif
+ 
+ # Build everything with full IEEE math support, and with dynamic rounding;
+-- 
+2.22.0
+

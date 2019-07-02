@@ -1,0 +1,25 @@
+From d11f8dffe8decfde25d860cc42586bc5bbc01006 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 15:04:18 -0400
+Subject: [PATCH 3/9] alpha-cache-shape
+
+older verisons of glibc would build dl-sysdep as shared-only and dl-support as
+static-only.  alpha hooks in a cache variable via dl-auxv.h.  newer versions of
+glibc build dl-sysdep as both shared and static which means we now have symbol
+duplication for static builds with dl-sysdep and dl-support.  since dl-sysdep
+is both shared/static, there is no point in hooking dl-support anymore, so we
+can punt it.
+---
+ sysdeps/unix/sysv/linux/alpha/dl-support.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/sysdeps/unix/sysv/linux/alpha/dl-support.c b/sysdeps/unix/sysv/linux/alpha/dl-support.c
+index 29021767..080fadd4 100644
+--- a/sysdeps/unix/sysv/linux/alpha/dl-support.c
++++ b/sysdeps/unix/sysv/linux/alpha/dl-support.c
+@@ -1,2 +1 @@
+-#include "dl-auxv.h"
+ #include <elf/dl-support.c>
+-- 
+2.22.0
+

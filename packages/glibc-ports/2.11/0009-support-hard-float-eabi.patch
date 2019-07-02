@@ -1,0 +1,37 @@
+From 2a4116dab065f04d1605fc0435e9ca513367e276 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 15:07:45 -0400
+Subject: [PATCH 9/9] support-hard-float-eabi
+
+---
+ sysdeps/arm/preconfigure   | 2 +-
+ sysdeps/arm/shlib-versions | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/sysdeps/arm/preconfigure b/sysdeps/arm/preconfigure
+index 313da796..db660e03 100644
+--- a/sysdeps/arm/preconfigure
++++ b/sysdeps/arm/preconfigure
+@@ -2,7 +2,7 @@ case "$machine" in
+ arm*)
+ 	base_machine=arm
+ 	case $config_os in
+-	linux-gnueabi)
++	linux-gnueabi*)
+ 		machine=arm/eabi/$machine
+ 		;;
+ 	*)
+diff --git a/sysdeps/arm/shlib-versions b/sysdeps/arm/shlib-versions
+index ed6603f0..491dd0ad 100644
+--- a/sysdeps/arm/shlib-versions
++++ b/sysdeps/arm/shlib-versions
+@@ -1,4 +1,4 @@
+-arm.*-.*-linux-gnueabi	DEFAULT			GLIBC_2.4
++arm.*-.*-linux-gnueabi.*	DEFAULT			GLIBC_2.4
+ 
+-arm.*-.*-linux-gnueabi	ld=ld-linux.so.3
++arm.*-.*-linux-gnueabi.*	ld=ld-linux.so.3
+ arm.*-.*-linux.*	ld=ld-linux.so.2
+-- 
+2.22.0
+
