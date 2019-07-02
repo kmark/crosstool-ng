@@ -1,0 +1,48 @@
+From b04869345be4643bb56ffa39f96a1aa82d3bddf6 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:28:09 -0400
+Subject: [PATCH 20/49] http://bugs.gentoo.org/250342
+ http://sources.redhat.com/bugzilla/show_bug.cgi?id=9685
+
+we cant assume sock_cloexec and pipe2 are bound together as the former defines
+are found in glibc only while the latter are a combo of kernel headers and
+glibc.  so if we do a runtime detection of SOCK_CLOEXEC, but pipe2() is a stub
+inside of glibc, we hit a problem.  for example:
+
+main()
+{
+	getgrnam("portage");
+	if (!popen("ls", "r"))
+		perror("popen()");
+}
+
+getgrnam() will detect that the kernel supports SOCK_CLOEXEC and then set both
+__have_sock_cloexec and __have_pipe2 to true.  but if glibc was built against
+older kernel headers where __NR_pipe2 does not exist, glibc will have a ENOSYS
+stub for it.  so popen() will always fail as glibc assumes pipe2() works.
+---
+ socket/have_sock_cloexec.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/socket/have_sock_cloexec.c b/socket/have_sock_cloexec.c
+index 22dccdf722..c728d98173 100644
+--- a/socket/have_sock_cloexec.c
++++ b/socket/have_sock_cloexec.c
+@@ -16,9 +16,14 @@
+    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+    02111-1307 USA.  */
+ 
++#include <fcntl.h>
+ #include <sys/socket.h>
+ #include <kernel-features.h>
+ 
+ #if defined SOCK_CLOEXEC && !defined __ASSUME_SOCK_CLOEXEC
+ int __have_sock_cloexec;
+ #endif
++
++#if defined O_CLOEXEC && !defined __ASSUME_PIPE2
++int __have_pipe2;
++#endif
+-- 
+2.22.0
+

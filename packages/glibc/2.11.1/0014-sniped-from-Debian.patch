@@ -1,0 +1,48 @@
+From 08beea1cefc337717b1a4c7dfac8fcc0ed45b3e7 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:25:24 -0400
+Subject: [PATCH 14/49] sniped from Debian http://bugs.gentoo.org/289615
+
+2009-10-27  Aurelien Jarno  <aurelien@aurel32.net>
+
+	* locale/programs/locarchive.c: use MMAP_SHARED to reserve memory
+	used later with MMAP_FIXED | MMAP_SHARED to cope with different
+	alignment restrictions.
+---
+ locale/programs/locarchive.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/locale/programs/locarchive.c b/locale/programs/locarchive.c
+index 85ba77d194..8db76ef69f 100644
+--- a/locale/programs/locarchive.c
++++ b/locale/programs/locarchive.c
+@@ -134,7 +134,7 @@ create_archive (const char *archivefname, struct locarhandle *ah)
+   size_t reserved = RESERVE_MMAP_SIZE;
+   int xflags = 0;
+   if (total < reserved
+-      && ((p = mmap64 (NULL, reserved, PROT_NONE, MAP_PRIVATE | MAP_ANON,
++      && ((p = mmap64 (NULL, reserved, PROT_NONE, MAP_SHARED | MAP_ANON,
+ 		       -1, 0)) != MAP_FAILED))
+     xflags = MAP_FIXED;
+   else
+@@ -396,7 +396,7 @@ enlarge_archive (struct locarhandle *ah, const struct locarhead *head)
+   size_t reserved = RESERVE_MMAP_SIZE;
+   int xflags = 0;
+   if (total < reserved
+-      && ((p = mmap64 (NULL, reserved, PROT_NONE, MAP_PRIVATE | MAP_ANON,
++      && ((p = mmap64 (NULL, reserved, PROT_NONE, MAP_SHARED | MAP_ANON,
+ 		       -1, 0)) != MAP_FAILED))
+     xflags = MAP_FIXED;
+   else
+@@ -614,7 +614,7 @@ open_archive (struct locarhandle *ah, bool readonly)
+   int xflags = 0;
+   void *p;
+   if (st.st_size < reserved
+-      && ((p = mmap64 (NULL, reserved, PROT_NONE, MAP_PRIVATE | MAP_ANON,
++      && ((p = mmap64 (NULL, reserved, PROT_NONE, MAP_SHARED | MAP_ANON,
+ 		       -1, 0)) != MAP_FAILED))
+     xflags = MAP_FIXED;
+   else
+-- 
+2.22.0
+

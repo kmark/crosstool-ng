@@ -1,0 +1,25 @@
+From 77d5847a5e0342b6617e242b9c73f21139656449 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:45:02 -0400
+Subject: [PATCH 36/49] syslog
+
+---
+ misc/syslog.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/misc/syslog.c b/misc/syslog.c
+index 90cd3bfa14..a292260b11 100644
+--- a/misc/syslog.c
++++ b/misc/syslog.c
+@@ -152,7 +152,7 @@ __vsyslog_chk(int pri, int flag, const char *fmt, va_list ap)
+ #define	INTERNALLOG	LOG_ERR|LOG_CONS|LOG_PERROR|LOG_PID
+ 	/* Check for invalid bits. */
+ 	if (pri & ~(LOG_PRIMASK|LOG_FACMASK)) {
+-		syslog(INTERNALLOG,
++		__syslog(INTERNALLOG,
+ 		    "syslog: unknown facility/priority: %x", pri);
+ 		pri &= LOG_PRIMASK|LOG_FACMASK;
+ 	}
+-- 
+2.22.0
+

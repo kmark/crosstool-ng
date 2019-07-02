@@ -1,0 +1,70 @@
+From 7e204cfe6daf946d0a88431eda99692bec4df92e Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:36:46 -0400
+Subject: [PATCH 29/49] 
+ http://sourceware.org/ml/libc-hacker/2002-11/msg00071.html
+
+When fnmatch detects an invalid multibyte character it should fall back to
+single byte matching, so that "*" has a chance to match such a string.
+
+Andreas.
+
+2005-04-12  Andreas Schwab  <schwab@suse.de>
+
+	* posix/fnmatch.c (fnmatch): If conversion to wide character
+	fails fall back to single byte matching.
+---
+ posix/fnmatch.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/posix/fnmatch.c b/posix/fnmatch.c
+index 4baef9e69b..9b41986d7f 100644
+--- a/posix/fnmatch.c
++++ b/posix/fnmatch.c
+@@ -327,6 +327,7 @@ fnmatch (pattern, string, flags)
+ # if HANDLE_MULTIBYTE
+   if (__builtin_expect (MB_CUR_MAX, 1) != 1)
+     {
++      const char *orig_pattern = pattern;
+       mbstate_t ps;
+       size_t n;
+       const char *p;
+@@ -382,10 +383,8 @@ fnmatch (pattern, string, flags)
+ 	  wstring = (wchar_t *) alloca ((n + 1) * sizeof (wchar_t));
+ 	  n = mbsrtowcs (wstring, &p, n + 1, &ps);
+ 	  if (__builtin_expect (n == (size_t) -1, 0))
+-	    /* Something wrong.
+-	       XXX Do we have to set `errno' to something which mbsrtows hasn't
+-	       already done?  */
+-	    return -1;
++	    /* Something wrong.  Fall back to single byte matching.  */
++	    goto try_singlebyte;
+ 	  if (p)
+ 	    {
+ 	      memset (&ps, '\0', sizeof (ps));
+@@ -397,10 +396,8 @@ fnmatch (pattern, string, flags)
+ 	prepare_wstring:
+ 	  n = mbsrtowcs (NULL, &string, 0, &ps);
+ 	  if (__builtin_expect (n == (size_t) -1, 0))
+-	    /* Something wrong.
+-	       XXX Do we have to set `errno' to something which mbsrtows hasn't
+-	       already done?  */
+-	    return -1;
++	    /* Something wrong.  Fall back to single byte matching.  */
++	    goto try_singlebyte;
+ 	  wstring = (wchar_t *) alloca ((n + 1) * sizeof (wchar_t));
+ 	  assert (mbsinit (&ps));
+ 	  (void) mbsrtowcs (wstring, &string, n + 1, &ps);
+@@ -408,6 +405,9 @@ fnmatch (pattern, string, flags)
+ 
+       return internal_fnwmatch (wpattern, wstring, wstring + n,
+ 				flags & FNM_PERIOD, flags, NULL);
++
++    try_singlebyte:
++      pattern = orig_pattern;
+     }
+ # endif  /* mbstate_t and mbsrtowcs or _LIBC.  */
+ 
+-- 
+2.22.0
+

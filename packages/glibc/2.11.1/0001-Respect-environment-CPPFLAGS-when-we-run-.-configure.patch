@@ -1,0 +1,38 @@
+From ebec47eeca67a50b342ea0cf8fcf84eb63156aea Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:05:15 -0400
+Subject: [PATCH 01/49] Respect environment CPPFLAGS when we run ./configure so
+ we can inject random -D things without having to set CFLAGS/ASFLAGS
+
+---
+ Makeconfig     | 1 +
+ config.make.in | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/Makeconfig b/Makeconfig
+index 9f134cc137..b585f15e38 100644
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -688,6 +688,7 @@ CPPFLAGS = $($(subdir)-CPPFLAGS) $(+includes) $(defines) \
+ 	   $(foreach lib,$(libof-$(basename $(@F))) \
+ 		         $(libof-$(<F)) $(libof-$(@F)),$(CPPFLAGS-$(lib))) \
+ 	   $(CPPFLAGS-$(<F)) $(CPPFLAGS-$(@F)) $(CPPFLAGS-$(basename $(@F)))
++CPPFLAGS += $(CPPFLAGS-config)
+ override CFLAGS	= -std=gnu99 $(gnu89-inline-CFLAGS) \
+ 		  $(filter-out %frame-pointer,$(+cflags)) $(+gccwarn-c) \
+ 		  $(sysdep-CFLAGS) $(CFLAGS-$(suffix $@)) $(CFLAGS-$(<F)) \
+diff --git a/config.make.in b/config.make.in
+index d65706ceac..2abd90c317 100644
+--- a/config.make.in
++++ b/config.make.in
+@@ -106,6 +106,7 @@ CC = @CC@
+ CXX = @CXX@
+ BUILD_CC = @BUILD_CC@
+ CFLAGS = @CFLAGS@
++CPPFLAGS-config = @CPPFLAGS@
+ ASFLAGS-config = @ASFLAGS_config@
+ AR = @AR@
+ RANLIB = @RANLIB@
+-- 
+2.22.0
+

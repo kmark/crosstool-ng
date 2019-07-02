@@ -1,0 +1,29 @@
+From 06104385fa44be107e4f8df720fd04c529070040 Mon Sep 17 00:00:00 2001
+From: Steve Ellcey <sellcey@mips.com>
+Date: Fri, 11 Dec 2015 09:19:37 -0800
+Subject: [PATCH 05/49] Fix indentation.
+
+        * sysdeps/ieee754/flt-32/k_rem_pio2f.c (__kernel_rem_pio2f):
+        Fix indentation.
+---
+ sysdeps/ieee754/flt-32/k_rem_pio2f.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/sysdeps/ieee754/flt-32/k_rem_pio2f.c b/sysdeps/ieee754/flt-32/k_rem_pio2f.c
+index 2783480fcb..6fb7b8ba3d 100644
+--- a/sysdeps/ieee754/flt-32/k_rem_pio2f.c
++++ b/sysdeps/ieee754/flt-32/k_rem_pio2f.c
+@@ -82,7 +82,9 @@ twon8  =  3.9062500000e-03; /* 0x3b800000 */
+ 
+     /* compute q[0],q[1],...q[jk] */
+ 	for (i=0;i<=jk;i++) {
+-	    for(j=0,fw=0.0;j<=jx;j++) fw += x[j]*f[jx+i-j]; q[i] = fw;
++	    for(j=0,fw=0.0;j<=jx;j++)
++		fw += x[j]*f[jx+i-j];
++	    q[i] = fw;
+ 	}
+ 
+ 	jz = jk;
+-- 
+2.22.0
+

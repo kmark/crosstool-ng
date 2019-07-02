@@ -1,0 +1,43 @@
+From bfadfba2a31b25e67fd4c230c68b7a21db29771e Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:46:16 -0400
+Subject: [PATCH 39/49] typedef-caddr
+
+---
+ posix/sys/types.h  | 3 +++
+ sunrpc/rpc/types.h | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/posix/sys/types.h b/posix/sys/types.h
+index 04563a4abc..2e05fc0770 100644
+--- a/posix/sys/types.h
++++ b/posix/sys/types.h
+@@ -114,7 +114,10 @@ typedef __ssize_t ssize_t;
+ #ifdef	__USE_BSD
+ # ifndef __daddr_t_defined
+ typedef __daddr_t daddr_t;
++#  if ! defined(caddr_t) && ! defined(__caddr_t_defined)
+ typedef __caddr_t caddr_t;
++#   define __caddr_t_defined
++#  endif
+ #  define __daddr_t_defined
+ # endif
+ #endif
+diff --git a/sunrpc/rpc/types.h b/sunrpc/rpc/types.h
+index 611a60ed42..b825b2aba1 100644
+--- a/sunrpc/rpc/types.h
++++ b/sunrpc/rpc/types.h
+@@ -85,7 +85,10 @@ typedef __fsid_t fsid_t;
+ #endif
+ #ifndef __daddr_t_defined
+ typedef __daddr_t daddr_t;
++# if ! defined(caddr_t) && ! defined(__caddr_t_defined)
+ typedef __caddr_t caddr_t;
++#  define __caddr_t_defined
++# endif
+ # define __daddr_t_defined
+ #endif
+ 
+-- 
+2.22.0
+

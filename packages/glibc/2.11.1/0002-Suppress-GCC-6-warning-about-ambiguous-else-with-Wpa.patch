@@ -1,0 +1,83 @@
+From 91474c5af9b30c9af5a7fc64f9a6f9949a5de371 Mon Sep 17 00:00:00 2001
+From: Yvan Roux <yvan.roux@linaro.org>
+Date: Fri, 15 Apr 2016 13:29:26 +0200
+Subject: [PATCH 02/49] Suppress GCC 6 warning about ambiguous 'else' with
+ -Wparentheses
+
+---
+ nis/nis_call.c  | 20 +++++++++++---------
+ stdlib/setenv.c | 26 ++++++++++++++------------
+ 2 files changed, 25 insertions(+), 21 deletions(-)
+
+diff --git a/nis/nis_call.c b/nis/nis_call.c
+index 6ae4ce5dbd..e3300730ae 100644
+--- a/nis/nis_call.c
++++ b/nis/nis_call.c
+@@ -682,16 +682,18 @@ nis_server_cache_add (const_nis_name name, int search_parent,
+   /* Choose which entry should be evicted from the cache.  */
+   loc = &nis_server_cache[0];
+   if (*loc != NULL)
+-    for (i = 1; i < 16; ++i)
+-      if (nis_server_cache[i] == NULL)
+-	{
++    {
++      for (i = 1; i < 16; ++i)
++	if (nis_server_cache[i] == NULL)
++	  {
++	    loc = &nis_server_cache[i];
++	    break;
++	  }
++	else if ((*loc)->uses > nis_server_cache[i]->uses
++		 || ((*loc)->uses == nis_server_cache[i]->uses
++		     && (*loc)->expires > nis_server_cache[i]->expires))
+ 	  loc = &nis_server_cache[i];
+-	  break;
+-	}
+-      else if ((*loc)->uses > nis_server_cache[i]->uses
+-	       || ((*loc)->uses == nis_server_cache[i]->uses
+-		   && (*loc)->expires > nis_server_cache[i]->expires))
+-	loc = &nis_server_cache[i];
++    }
+   old = *loc;
+   *loc = new;
+ 
+diff --git a/stdlib/setenv.c b/stdlib/setenv.c
+index fe591b7db8..b4a0573dfa 100644
+--- a/stdlib/setenv.c
++++ b/stdlib/setenv.c
+@@ -294,18 +294,20 @@ unsetenv (name)
+   ep = __environ;
+   if (ep != NULL)
+     while (*ep != NULL)
+-      if (!strncmp (*ep, name, len) && (*ep)[len] == '=')
+-	{
+-	  /* Found it.  Remove this pointer by moving later ones back.  */
+-	  char **dp = ep;
+-
+-	  do
+-	    dp[0] = dp[1];
+-	  while (*dp++);
+-	  /* Continue the loop in case NAME appears again.  */
+-	}
+-      else
+-	++ep;
++      {
++	if (!strncmp (*ep, name, len) && (*ep)[len] == '=')
++	  {
++	    /* Found it.  Remove this pointer by moving later ones back.  */
++	    char **dp = ep;
++
++	    do
++		dp[0] = dp[1];
++	    while (*dp++);
++	    /* Continue the loop in case NAME appears again.  */
++	  }
++	else
++	  ++ep;
++      }
+ 
+   UNLOCK;
+ 
+-- 
+2.22.0
+

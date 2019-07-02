@@ -1,0 +1,87 @@
+From fc01bf63ae8825c47aabb8a573a5a99bae554744 Mon Sep 17 00:00:00 2001
+From: Martin Sebor <msebor@redhat.com>
+Date: Wed, 15 Nov 2017 17:39:59 -0700
+Subject: [PATCH 47/49] The -Wstringop-truncation option new in GCC 8 detects
+ common misuses of the strncat and strncpy function that may result in
+ truncating the copied string before the terminating NUL.  To avoid false
+ positive warnings for correct code that intentionally creates sequences of
+ characters that aren't guaranteed to be NUL-terminated, arrays that are
+ intended to store such sequences should be decorated with a new nonstring
+ attribute.  This change add this attribute to Glibc and uses it to suppress
+ such false positives.
+
+ChangeLog:
+        * misc/sys/cdefs.h (__attribute_nonstring__): New macro.
+        * sysdeps/gnu/bits/utmp.h (struct utmp): Use it.
+        * sysdeps/unix/sysv/linux/s390/bits/utmp.h (struct utmp): Same.
+---
+ misc/sys/cdefs.h                         | 9 +++++++++
+ sysdeps/gnu/bits/utmp.h                  | 9 ++++++---
+ sysdeps/unix/sysv/linux/s390/bits/utmp.h | 9 ++++++---
+ 3 files changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/misc/sys/cdefs.h b/misc/sys/cdefs.h
+index c9495a479e..4cd7555d0c 100644
+--- a/misc/sys/cdefs.h
++++ b/misc/sys/cdefs.h
+@@ -350,6 +350,15 @@
+ # endif
+ #endif
+ 
++#if __GNUC_PREREQ (8, 0)
++/* Describes a char array whose address can safely be passed as the first
++   argument to strncpy and strncat, as the char array is not necessarily
++   a NUL-terminated string.  */
++# define __attribute_nonstring__ __attribute__ ((__nonstring__))
++#else
++# define __attribute_nonstring__
++#endif
++
+ #include <bits/wordsize.h>
+ 
+ #if defined __LONG_DOUBLE_MATH_OPTIONAL && defined __NO_LONG_DOUBLE_MATH
+diff --git a/sysdeps/gnu/bits/utmp.h b/sysdeps/gnu/bits/utmp.h
+index e855ad73f8..1e643b2b69 100644
+--- a/sysdeps/gnu/bits/utmp.h
++++ b/sysdeps/gnu/bits/utmp.h
+@@ -61,10 +61,13 @@ struct utmp
+ {
+   short int ut_type;		/* Type of login.  */
+   pid_t ut_pid;			/* Process ID of login process.  */
+-  char ut_line[UT_LINESIZE];	/* Devicename.  */
++  char ut_line[UT_LINESIZE]
++    __attribute_nonstring__;	/* Devicename.  */
+   char ut_id[4];		/* Inittab ID.  */
+-  char ut_user[UT_NAMESIZE];	/* Username.  */
+-  char ut_host[UT_HOSTSIZE];	/* Hostname for remote login.  */
++  char ut_user[UT_NAMESIZE]
++    __attribute_nonstring__;	/* Username.  */
++  char ut_host[UT_HOSTSIZE]
++    __attribute_nonstring__;	/* Hostname for remote login.  */
+   struct exit_status ut_exit;	/* Exit status of a process marked
+ 				   as DEAD_PROCESS.  */
+ /* The ut_session and ut_tv fields must be the same size when compiled
+diff --git a/sysdeps/unix/sysv/linux/s390/bits/utmp.h b/sysdeps/unix/sysv/linux/s390/bits/utmp.h
+index acb82b0ac7..fb3c8c263f 100644
+--- a/sysdeps/unix/sysv/linux/s390/bits/utmp.h
++++ b/sysdeps/unix/sysv/linux/s390/bits/utmp.h
+@@ -61,10 +61,13 @@ struct utmp
+ {
+   short int ut_type;		/* Type of login.  */
+   pid_t ut_pid;			/* Process ID of login process.  */
+-  char ut_line[UT_LINESIZE];	/* Devicename.  */
++  char ut_line[UT_LINESIZE]
++     __attribute_nonstring__;	/* Devicename.  */
+   char ut_id[4];		/* Inittab ID.  */
+-  char ut_user[UT_NAMESIZE];	/* Username.  */
+-  char ut_host[UT_HOSTSIZE];	/* Hostname for remote login.  */
++  char ut_user[UT_NAMESIZE]
++     __attribute_nonstring__;	/* Username.  */
++  char ut_host[UT_HOSTSIZE]
++     __attribute_nonstring__;	/* Hostname for remote login.  */
+   struct exit_status ut_exit;	/* Exit status of a process marked
+ 				   as DEAD_PROCESS.  */
+ /* The ut_session and ut_tv fields must be the same size when compiled
+-- 
+2.22.0
+

@@ -1,0 +1,28 @@
+From 24ae7a414ceee86254d131f713f82e55eee09351 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:46:56 -0400
+Subject: [PATCH 41/49] make-382
+
+http://git.frugalware.org/gitweb/gitweb.cgi?p=frugalware-current.git;a=blob_plain;f=source/base/glibc/make-3.82-fix.patch;hb=8217c32ecc2e14962847ba3d8a272eb64a3dba4f
+---
+ manual/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/manual/Makefile b/manual/Makefile
+index 39e7a9bf6d..3f85f5d372 100644
+--- a/manual/Makefile
++++ b/manual/Makefile
+@@ -237,7 +237,9 @@ ifdef objpfx
+ .PHONY: stubs
+ stubs: $(objpfx)stubs
+ endif
+-$(objpfx)stubs ../po/manual.pot $(objpfx)stamp%:
++$(objpfx)stubs ../po/manual.pot:
++	touch $@
++$(objpfx)stamp%:
+ 	$(make-target-directory)
+ 	touch $@
+ 
+-- 
+2.22.0
+

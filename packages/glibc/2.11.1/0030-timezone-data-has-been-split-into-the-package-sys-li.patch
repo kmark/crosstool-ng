@@ -1,0 +1,26 @@
+From cfd1a3ae4b92abed6b11153aa8ca491ac4dc43e9 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:37:11 -0400
+Subject: [PATCH 30/49] timezone data has been split into the package
+ sys-libs/timezone-data
+
+---
+ Makeconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makeconfig b/Makeconfig
+index b2dc8069a9..4bd530d3d6 100644
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -935,7 +935,7 @@ all-subdirs = csu assert ctype locale intl catgets math setjmp signal	    \
+ 	      stdlib stdio-common libio malloc string wcsmbs time dirent    \
+ 	      grp pwd posix io termios resource misc socket sysvipc gmon    \
+ 	      gnulib iconv iconvdata wctype manual shadow gshadow po argp   \
+-	      crypt nss localedata timezone rt conform debug		    \
++	      crypt nss localedata rt conform debug		    \
+ 	      $(add-on-subdirs) $(dlfcn) $(binfmt-subdir)
+ 
+ ifndef avoid-generated
+-- 
+2.22.0
+

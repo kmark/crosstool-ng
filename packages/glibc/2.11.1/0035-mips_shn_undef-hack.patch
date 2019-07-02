@@ -1,0 +1,29 @@
+From c50a6672a3febcbc515a07a6967f755a98f10b66 Mon Sep 17 00:00:00 2001
+From: Kevin Mark <kmark937@gmail.com>
+Date: Tue, 2 Jul 2019 14:40:48 -0400
+Subject: [PATCH 35/49] mips_shn_undef-hack
+
+---
+ elf/dl-lookup.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/elf/dl-lookup.c b/elf/dl-lookup.c
+index c1a1366d6f..b8b52420da 100644
+--- a/elf/dl-lookup.c
++++ b/elf/dl-lookup.c
+@@ -300,6 +300,12 @@ do_lookup_x (const char *undef_name, uint_fast32_t new_hash,
+ 	      /* FALLTHROUGH */
+ 	    case STB_GLOBAL:
+ 	    success:
++#ifdef __mips__
++	      /* HACK: MIPS marks its lazy evaluation stubs with SHN_UNDEF
++		 symbols, we skip them. */
++	      if (sym->st_shndx == SHN_UNDEF)
++		break;
++#endif
+ 	      /* Global definition.  Just what we need.  */
+ 	      result->s = sym;
+ 	      result->m = (struct link_map *) map;
+-- 
+2.22.0
+
